@@ -4,23 +4,23 @@ const addQuoteButton = document.getElementById('addQuoteButton');
 
 let quotes = [
     {
-        quote: "The time is always right to do what is right",
+        text: "The time is always right to do what is right",
         category: "Inspirational"
     },
     {
-        quote: "Turn your wounds into wisdom.",
+        text: "Turn your wounds into wisdom.",
         category: "Life Lesson"
     },
     {
-        quote: "The only thing we have to fear is fear itself",
+        text: "The only thing we have to fear is fear itself",
         category: "Famous"
     },
     {
-        quote: "You have brains in your head. You have feet in your shoes.",
+        text: "You have brains in your head. You have feet in your shoes.",
         category: "Motivational"
     },
     {
-        quote: "All you need in this life is ignorance and confidence; then success is sure.",
+        text: "All you need in this life is ignorance and confidence; then success is sure.",
         category: "Humor"
     }
 ];
@@ -29,7 +29,7 @@ let quotes = [
 function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const selectedQuote = quotes[randomIndex];
-    quoteDisplay.innerHTML = `<p>${selectedQuote.quote} <em>(${selectedQuote.category})</em></p>`;
+    quoteDisplay.innerHTML = `<p>${selectedQuote.text} <em>(${selectedQuote.category})</em></p>`;
 }
 
 // Function to add a new quote
@@ -38,7 +38,7 @@ function addQuote() {
     const newQuoteCategory = document.getElementById('newQuoteCategory').value;
 
     if (newQuoteText && newQuoteCategory) {
-        quotes.push({ quote: newQuoteText, category: newQuoteCategory });
+        quotes.push({ text: newQuoteText, category: newQuoteCategory });
         document.getElementById('newQuoteText').value = '';
         document.getElementById('newQuoteCategory').value = '';
         alert('Quote added successfully!');
