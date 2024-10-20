@@ -51,16 +51,21 @@ async function postQuoteToServer(quote) {
 
 // Synchronize local quotes with server quotes
 async function syncQuotes() {
-    const storedQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
-    
-    // Fetch latest quotes from the server
-    await fetchQuotesFromServer();
+    try {
+        const storedQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+        
+        // Fetch latest quotes from the server
+        await fetchQuotesFromServer();
 
-    // Add any new local quotes that aren't already on the server
-    storedQuotes.forEach(quote => {
-        // Assuming each quote has a unique title for simplicity
-        postQuoteToServer(quote);
-    });
+        // Post any new local quotes that aren't already on the server
+        for (const quote of storedQuotes) {
+            await postQuoteToServer(quote);
+        }
+
+        notifyUser("Quotes synced with server!"); // Notify on successful sync
+    } catch (error) {
+        console.error('Error syncing quotes:', error);
+    }
 }
 
 // Update local quotes and handle conflicts
