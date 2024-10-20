@@ -43,11 +43,24 @@ async function postQuoteToServer(quote) {
         }
 
         const newQuote = await response.json();
-        // Optionally, you can handle the server's response here
         notifyUser(`Quote posted: "${newQuote.title}"`);
     } catch (error) {
         console.error('Error posting quote:', error);
     }
+}
+
+// Synchronize local quotes with server quotes
+async function syncQuotes() {
+    const storedQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
+    
+    // Fetch latest quotes from the server
+    await fetchQuotesFromServer();
+
+    // Add any new local quotes that aren't already on the server
+    storedQuotes.forEach(quote => {
+        // Assuming each quote has a unique title for simplicity
+        postQuoteToServer(quote);
+    });
 }
 
 // Update local quotes and handle conflicts
@@ -90,7 +103,7 @@ function notifyUser(message) {
 async function initialize() {
     loadQuotes();
     await fetchQuotesFromServer();
-    setInterval(fetchQuotesFromServer, 30000);
+    setInterval(syncQuotes, 30000); // Sync every 30 seconds
 }
 
 // Add a new quote and post to server
