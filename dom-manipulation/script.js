@@ -27,10 +27,33 @@ let quotes = [
 }
 ];
 
+// Load quotes from local storage
+function loadQuotes() {
+    const storedQuotes = localStorage.getItem("quotes");
+    if (storedQuotes) {
+        quotes = JSON.parse(storedQuotes);
+    } else {
+        // Default quotes if nothing is in local storage
+        quotes = [
+            { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", category: "Inspiration" },
+            { text: "The purpose of our lives is to be happy.", category: "Happiness" },
+            { text: "Life is what happens when you're busy making other plans.", category: "Life" },
+        ];
+    }
+}
+
+// Save quotes to local storage
+function saveQuotes() {
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
 function showRandomQuote() {
     const randomIndex = Math.floor(Math.random() * quotes.length);
     const randomQuote = quotes[randomIndex];
     quoteDisplay.innerHTML = `"${randomQuote.text}" - ${randomQuote.category}`;
+
+    // Store last viewed quote in session storage
+    sessionStorage.setItem("lastQuote", JSON.stringify(quote));
 }
 
 function addQuote() {
@@ -39,6 +62,8 @@ function addQuote() {
 
     if (quoteText && quoteCategory) {
         quotes.push({ text: quoteText, category: quoteCategory});
+        saveQuotes();
+
         const newQuoteText = document.createElement('p');
         newQuoteText.textContent = `"${quoteText}"`;
         
@@ -64,5 +89,33 @@ function addQuote() {
 function createAddQuoteForm() {
     quoteForm.style.display = 'block';
 }
+
+// Export quotes to JSON
+function exportQuotes() {
+    const jsonStr = JSON.stringify(quotes);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "quotes.json";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Import quotes from JSON
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(event) {
+        const importedQuotes = JSON.parse(event.target.result);
+        quotes.push(...importedQuotes);
+        saveQuotes();
+        alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+}
+
+// Initialize the app
+loadQuotes();
 
 showQuoteBtn.addEventListener('click', showRandomQuote);
