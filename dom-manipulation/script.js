@@ -1,7 +1,7 @@
 const quoteDisplay = document.getElementById('quoteDisplay');
 const showQuoteBtn = document.getElementById('newQuote');
-const newQuoteText = document.getElementById('newQuoteText');
-const newQuoteCategory = document.getElementById('newQuoteCategory');
+const quoteTextInput = document.getElementById('newQuoteText');
+const quoteCategoryInput = document.getElementById('newQuoteCategory');
 const quoteForm = document.getElementById('quoteForm');
 
 let quotes = [
@@ -34,17 +34,29 @@ function showRandomQuote() {
 }
 
 function addQuote() {
-    const newQuoteTextValue = newQuoteText.value.trim();
-    const newQuoteCategoryValue = newQuoteCategory.value.trim();
+    const quoteText = quoteTextInput.value.trim();
+    const quoteCategory = quoteCategoryInput.value.trim();
 
-    if (newQuoteTextValue && newQuoteCategoryValue) {
-        quotes.push({ text: newQuoteTextValue, category: newQuoteCategoryValue});
-        newQuoteText.value = '';
-        newQuoteCategory.value = '';
-        alert('Quote added successfully!');
-    }
+    if (quoteText && quoteCategory) {
+        quotes.push({ text: quoteText, category: quoteCategory});
+        const newQuoteText = document.createElement('p');
+        newQuoteText.textContent = `"${quoteText}"`;
+        
+        const newQuoteCategory = document.createElement('span');
+        newQuoteCategory.textContent = ` - ${quoteCategory}`;
+        newQuoteCategory.style.fontStyle = 'italic';
+
+        quoteDisplay.innerHTML = ''; // Clear the current display
+        quoteDisplay.appendChild(newQuoteText);
+        quoteDisplay.appendChild(newQuoteCategory);
+
+        // Clear the input fields
+        quoteTextInput.value = '';
+        quoteCategoryInput.value = '';
+        alert("Quote added successfully!");
+    } 
     else {
-        alert('Please fill all fields.');
+        alert("Please fill in both fields.");
     }
 }
 
