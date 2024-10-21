@@ -1,135 +1,56 @@
-const API_URL = 'https://jsonplaceholder.typicode.com/posts';
-let quotes = [];
+const quoteDisplay = document.getElementById('quoteDisplay');
+const showQuoteBtn = document.getElementById('newQuote');
+const newQuoteText = document.getElementById('newQuoteText');
+const newQuoteCategory = document.getElementById('newQuoteCategory');
+const quoteForm = document.getElementById('quoteForm');
 
-// Load quotes from local storage
-function loadQuotes() {
-    const storedQuotes = localStorage.getItem('quotes');
-    if (storedQuotes) {
-        quotes = JSON.parse(storedQuotes);
-    }
+let quotes = [
+{
+    text: "Many of life’s failures are people who did not realize how close they were to success when they gave up.",
+    category: "Inspirational quotes about life."
+},
+{
+    text: "Everything negative — pressure, challenges — is all an opportunity for me to rise.",
+    category: "Life lesson quotes."
+},
+{
+    text: "Courage is being scared to death, but saddling up anyway.",
+    category: "Famous quotes about life."
+},
+{
+    text: "You cannot swim for new horizons until you have courage to lose sight of the shore.",
+    category: "Beautiful quotes on life."
+},
+{
+    text: "Whether you think you can or you can’t, you’re right.",
+    category: "Funny life quotes."
+}
+];
+
+function showRandomQuote() {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    const randomQuote = quotes[randomIndex];
+    quoteDisplay.textContent = `"${randomQuote.text}" - ${randomQuote.category}`;
 }
 
-// Save quotes to local storage
-function saveQuotes() {
-    localStorage.setItem('quotes', JSON.stringify(quotes));
-}
-
-// Fetch quotes from the server
-async function fetchQuotesFromServer() {
-    try {
-        const response = await fetch(API_URL);
-        if (response.ok) {
-            const serverQuotes = await response.json();
-            updateQuotes(serverQuotes);
-        }
-    } catch (error) {
-        console.error('Error fetching quotes:', error);
-    }
-}
-
-// Post a new quote to the server
-async function postQuoteToServer(quote) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(quote),
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to post quote to server');
-        }
-
-        const newQuote = await response.json();
-        notifyUser(`Quote posted: "${newQuote.title}"`);
-    } catch (error) {
-        console.error('Error posting quote:', error);
-    }
-}
-
-// Synchronize local quotes with server quotes
-async function syncQuotes() {
-    try {
-        const storedQuotes = JSON.parse(localStorage.getItem('quotes')) || [];
-        
-        // Fetch latest quotes from the server
-        await fetchQuotesFromServer();
-
-        // Post any new local quotes that aren't already on the server
-        for (const quote of storedQuotes) {
-            await postQuoteToServer(quote);
-        }
-
-        notifyUser("Quotes synced with server!"); // Notify on successful sync
-    } catch (error) {
-        console.error('Error syncing quotes:', error);
-    }
-}
-
-// Update local quotes and handle conflicts
-function updateQuotes(serverQuotes) {
-    const existingQuotesMap = new Map(quotes.map(q => [q.text, q]));
-
-    serverQuotes.forEach(serverQuote => {
-        const { title: text, body: category } = serverQuote;
-
-        if (existingQuotesMap.has(text)) {
-            notifyUser(`Conflict detected for quote: "${text}". Using server version.`);
-            existingQuotesMap.set(text, { text, category });
-        } else {
-            existingQuotesMap.set(text, { text, category });
-        }
-    });
-
-    quotes = Array.from(existingQuotesMap.values());
-    saveQuotes();
-    populateCategories();
-}
-
-// Notify user about updates
-function notifyUser(message) {
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.position = 'fixed';
-    notification.style.top = '10px';
-    notification.style.right = '10px';
-    notification.style.backgroundColor = 'lightgreen';
-    notification.style.padding = '10px';
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        document.body.removeChild(notification);
-    }, 3000);
-}
-
-// Initialize the application and start periodic fetching
-async function initialize() {
-    loadQuotes();
-    await fetchQuotesFromServer();
-    setInterval(syncQuotes, 30000); // Sync every 30 seconds
-}
-
-// Add a new quote and post to server
 function addQuote() {
-    const newQuoteText = document.getElementById('newQuoteText').value;
-    const newQuoteCategory = document.getElementById('newQuoteCategory').value;
+    const newQuoteTextValue = newQuoteText.value.trim();
+    const newQuoteCategoryValue = newQuoteCategory.value.trim();
 
-    if (newQuoteText.trim() === '' || newQuoteCategory.trim() === '') {
-        alert('Please enter both a quote and a category.');
-        return;
+    if (newQuoteTextValue && newQuoteCategoryValue) {
+        quotes.push({ text: newQuoteTextValue, category: newQuoteCategoryValue});
+        newQuoteText.value = '';
+        newQuoteCategory.value = '';
+        alert('Quote added successfully!');
     }
-
-    const newQuote = { title: newQuoteText, body: newQuoteCategory };
-    quotes.push(newQuote);
-    saveQuotes();
-    postQuoteToServer(newQuote); // Send the new quote to the server
-    populateCategories();
-    document.getElementById('newQuoteText').value = '';
-    document.getElementById('newQuoteCategory').value = '';
-    notifyUser('Quote added successfully!');
+    else {
+        alert('Please fill all fields.');
+    }
 }
 
-// Call initialize on page load
-initialize();
+// Function to create and display the add quote form
+function createAddQuoteForm() {
+    quoteForm.style.display = 'block';
+}
+
+showQuoteBtn.addEventListener('click', showRandomQuote);
